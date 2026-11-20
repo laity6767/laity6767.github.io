@@ -1,0 +1,2 @@
+<aside><section class="panel"><h3>关于我</h3><div class="profile"><img src="<%= url_for('assets/lander.webp') %>" alt=""><strong><%= site.data.profile.byline %></strong></div><p><%= site.data.profile.biography %></p></section>
+<section class="panel"><h3>标签索引</h3><div class="tagcloud"><% site.tags.each(t=>{ %><a class="tag" href="<%= url_for(t.path) %>"># <%= t.name %></a><% }) %></div></section></aside>

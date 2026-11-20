@@ -1,0 +1,19 @@
+title: AOM
+subtitle: An Ordinary Mind
+language: zh-CN
+timezone: Asia/Shanghai
+url: http://localhost:4000
+root: /
+permalink: posts/:slug/
+theme: aom
+per_page: 0
+archive_generator:
+  per_page: 0
+category_generator:
+  per_page: 0
+tag_generator:
+  per_page: 0
+category_map:
+  学习资料: study
+  个人手记: journal
+  有感: thoughts

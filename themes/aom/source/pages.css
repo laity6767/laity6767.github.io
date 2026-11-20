@@ -1,0 +1,2 @@
+.bodycopy a{color:var(--lime);text-decoration:underline}.bodycopy img,.bodycopy video{max-width:100%;height:auto}.bodycopy pre{overflow-x:auto}.columns>article,.columns>section{min-width:0}.bodycopy{overflow-wrap:anywhere}.topinner nav{margin-left:auto}
+@media(max-width:730px){.topinner nav a{font-size:15px}.postrow{align-items:start}.tabs{flex-wrap:wrap}}

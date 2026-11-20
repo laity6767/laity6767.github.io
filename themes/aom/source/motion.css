@@ -1,0 +1,100 @@
+/* The journal uses three speeds: contact, page handover and reading order. */
+:root {
+  --motion-ease: cubic-bezier(.2,.75,.22,1);
+  --motion-spring: cubic-bezier(.18,.89,.32,1.22);
+}
+#app:focus { outline: none; }
+#route-trace {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 23vw;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(103deg, transparent 30%, rgb(179 247 137 / .045) 69%, rgb(196 255 170 / .22) 70%, transparent 71%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes page-reveal {
+    from { opacity: .3; clip-path: polygon(0 0, 4% 0, 0 100%, 0 100%); }
+    to { opacity: 1; clip-path: polygon(0 0, 110% 0, 100% 100%, 0 100%); }
+  }
+  @keyframes title-resolve {
+    from { opacity: .2; filter: blur(5px); transform: translateY(8px); }
+    to { opacity: 1; filter: blur(0); transform: none; }
+  }
+  @keyframes item-arrive {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes dialog-arrive {
+    from { opacity: 0; transform: translateY(12px) scale(.975); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes backdrop-arrive { from { opacity: 0; } to { opacity: 1; } }
+  #app > * { animation: page-reveal 320ms var(--motion-ease) backwards; }
+  .hero h1, .page-title { animation: title-resolve 360ms var(--motion-ease) backwards; }
+  .hero p, .hero .primary { animation: item-arrive 320ms 60ms var(--motion-ease) backwards; }
+  .postrow, .archive-row, .indexitem, .panel {
+    animation: item-arrive 290ms var(--motion-ease) backwards;
+  }
+  :is(.postrow,.archive-row,.indexitem,.panel):nth-of-type(2) { animation-delay: 40ms; }
+  :is(.postrow,.archive-row,.indexitem):nth-of-type(3) { animation-delay: 70ms; }
+  :is(.postrow,.archive-row,.indexitem):nth-of-type(n+4) { animation-delay: 100ms; }
+  dialog[open] { animation: dialog-arrive 185ms var(--motion-ease); }
+  dialog[open]::backdrop { animation: backdrop-arrive 150ms ease-out; }
+
+  /* Applies to static controls and links added later by search or filtering. */
+  :is(a[href],button) {
+    transition: color 140ms ease, background-color 160ms ease, border-color 160ms ease,
+      box-shadow 180ms ease, scale 150ms var(--motion-spring), translate 150ms var(--motion-spring),
+      filter 130ms ease;
+  }
+  :is(a[href],button):focus-visible {
+    box-shadow: 0 0 0 4px rgb(179 247 137 / .16);
+  }
+  :is(a[href],button):active {
+    scale: .96;
+    filter: brightness(1.22);
+    transition-duration: 65ms;
+  }
+  .postinfo h3 a, .meta a, .crumb a, .foot > a:last-child, .back { display: inline-block; }
+  .brand img,.small-brand img,.primary svg,.search-toggle svg {
+    transition: transform 280ms var(--motion-spring);
+  }
+  :is(.brand,.small-brand):is(:hover,:focus-visible) img { transform: rotate(-22deg) scale(1.07); }
+  nav a::after {
+    content: ''; position: absolute; inset: auto 0 0; height: 2px; background: var(--lime);
+    transform-origin: left; transform: scaleX(0); transition: transform 180ms var(--motion-ease);
+  }
+  nav a:is([aria-current],:hover,:focus-visible)::after { transform: scaleX(1); }
+  .primary { position: relative; overflow: hidden; isolation: isolate; }
+  .primary::after {
+    content: ''; position: absolute; inset: -30% auto -30% -65%; width: 50%;
+    pointer-events: none; background: linear-gradient(100deg,transparent,#fff8,transparent);
+    transform: skewX(-18deg); transition: transform 0s;
+  }
+  .primary:is(:hover,:focus-visible)::after {
+    transform: translateX(380%) skewX(-18deg); transition-duration: 420ms;
+  }
+  .primary:is(:hover,:focus-visible) svg { transform: rotate(-7deg); }
+  .primary:is(:hover,:focus-visible) { box-shadow: 0 3px 18px #b3f78930; }
+  .tag:is(:hover,:focus-visible), .tabs a:is(:hover,:focus-visible) {
+    border-color: #7b9c70; box-shadow: 0 0 9px #b3f7891a; translate: 0 -1px;
+  }
+  .search-toggle:is(:hover,:focus-visible) svg { transform: scale(1.14) rotate(-8deg); }
+  .close:is(:hover,:focus-visible) { color: var(--lime); rotate: 8deg; }
+  .close { transition: rotate 140ms ease, color 140ms ease, scale 100ms ease; }
+  :is(.indexitem,.archive-row,.result):is(:hover,:focus-visible) {
+    background-color: #182019; box-shadow: inset 2px 0 var(--lime);
+  }
+  :is(.archive-row,.result) strong { transition: translate 170ms var(--motion-ease); }
+  :is(.archive-row,.result):is(:hover,:focus-visible) strong { translate: 5px 0; }
+  .stats a:is(:hover,:focus-visible) { background-color: #1c251f; }
+  .thumb:is(:hover,:focus-visible) { box-shadow: 0 0 0 1px #79996a; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #route-trace { display: none; }
+  .thumb img { transition: none; }
+  .thumb:hover img { transform: none; }
+  :is(a[href],button):active { color: var(--lime); background-color: #273422; }
+}

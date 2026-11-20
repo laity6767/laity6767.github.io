@@ -1,0 +1,1 @@
+<div class="container columns"><section><h1 class="page-title"><%= is_tag()?'# '+page.tag:is_category()?page.category:'文章归档' %></h1><%- partial('_partial/list',{posts:page.posts}) %></section><%- partial('_partial/sidebar') %></div>
