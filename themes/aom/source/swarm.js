@@ -3,7 +3,7 @@
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const replay = document.querySelector('.swarm-replay');
   if (!window.requestAnimationFrame || !Element.prototype.animate) return;
-  const colors = ['#b5f584', '#85d7e7', '#ffc790', '#d1b1ff'];
+  const colors = ['#b5f584', '#85d7e7', '#ffc790', '#d1b1ff', '#fbadc6', '#85e7c4', '#f7df89'];
   const selector = '.heroin h1, .heroin p, .hero .primary, .page-title, .sectionhead, .tabs, .postrow, .indexitem, .panel, .bodycopy > *';
   let stop = () => {};
   const clamp = x => Math.max(0, Math.min(1, x));
@@ -14,7 +14,7 @@
     if (document.hidden || motion.matches) return;
     const w = innerWidth, h = innerHeight;
     const compact = w < 720;
-    const count = compact ? 3 : 4;
+    const count = compact ? 5 : 7;
     const tasks = [];
     for (const element of document.querySelectorAll(selector)) {
       const box = element.getBoundingClientRect();
@@ -41,8 +41,8 @@
     ctx.scale(dpr, dpr);
     document.body.append(canvas);
 
-    const duration = compact ? 420 : 600;
-    const travel = compact ? 150 : 230;
+    const duration = compact ? 285 : 390;
+    const travel = compact ? 95 : 145;
     const animations = [];
     let frame;
     stop = () => {
@@ -52,7 +52,7 @@
       stop = () => {};
     };
     for (const [i, task] of tasks.entries()) {
-      task.start = travel + (i % count) * 64 + Math.floor(i / count) * (duration + travel);
+      task.start = travel + (i % count) * 25 + Math.floor(i / count) * (duration + travel);
       const {element, box, typing, width} = task;
       const endInset = typing ? Math.max(0, box.width - width) : 0;
       animations.push(element.animate([
@@ -85,14 +85,15 @@
         const second = next && time >= first.start + duration;
         const task = second ? next : first;
         const color = colors[lane];
-        const from = second ? endpoint(first) : [w * .5 + 24 * Math.cos(lane * 2), Math.min(h * .3, 180) + 20 * Math.sin(lane * 2)];
+        const angle = (lane / count) * Math.PI * 2;
+        const from = second ? endpoint(first) : [w * .5 + 46 * Math.cos(angle), Math.min(h * .3, 180) + 32 * Math.sin(angle)];
         const x0 = task.box.left, y0 = task.box.top + (task.typing ? Math.min(24,task.height / 2) : 0);
         const t = clamp((time - task.start) / duration);
         const approach = clamp((time - (second ? first.start + duration : 0)) / (second ? travel : first.start));
         const end = endpoint(task);
         const x = t ? mix(x0,end[0],t) : mix(from[0],x0,approach);
         const y = t ? mix(y0,end[1],t) : mix(from[1],y0,approach) - 20 * Math.sin(Math.PI * approach);
-        ctx.globalAlpha = 1 - clamp((time - task.start - duration) / 170);
+        ctx.globalAlpha = 1 - clamp((time - task.start - duration) / 115);
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
         if (t > 0 && t < 1) {
@@ -106,7 +107,7 @@
         cursor(x, y, color);
       }
       ctx.globalAlpha = 1;
-      if (time < tasks[tasks.length - 1].start + duration + 180) frame = requestAnimationFrame(draw);
+      if (time < tasks[tasks.length - 1].start + duration + 125) frame = requestAnimationFrame(draw);
       else stop();
     }
     frame = requestAnimationFrame(draw);
