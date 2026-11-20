@@ -1,8 +1,8 @@
-// A handful of drawing tools reassemble the visible content on page entry.
+// A handful of drawing tools reassemble the visible content when the visitor starts the sequence.
 (() => {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const replay = document.querySelector('.swarm-replay');
-  if (!window.requestAnimationFrame || !Element.prototype.animate) return;
+  if (!replay || !window.requestAnimationFrame || !Element.prototype.animate) return;
   const colors = ['#b5f584', '#85d7e7', '#ffc790', '#d1b1ff', '#fbadc6', '#85e7c4', '#f7df89'];
   const selector = '.heroin h1, .heroin p, .hero .primary, .page-title, .sectionhead, .tabs, .postrow, .indexitem, .panel, .bodycopy > *';
   let stop = () => {};
@@ -76,6 +76,60 @@
       ctx.fill(); ctx.stroke(); ctx.restore();
     }
 
+    const cutEnd = Math.max(...tasks.map(task => task.start + duration));
+    const sweep = compact ? 580 : 800;
+    const total = cutEnd + sweep + 180;
+    const trackWidth = Math.min(610, w - 48);
+    const left = (w - trackWidth) / 2;
+    const top = h - (compact ? 160 : 108);
+    const cuts = tasks.map((task, i) => ({
+      start: task.start, track: i % 2, slot: Math.floor(i / 2),
+      color: colors[i % count]
+    }));
+
+    function drawTimeline(time) {
+      const fade = Math.min(clamp(time / 100), clamp((total - time) / 180));
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.translate(left, top);
+      ctx.fillStyle = '#101919';
+      ctx.fillRect(-10, -10, trackWidth + 20, 76);
+      ctx.strokeStyle = '#536459';
+      ctx.strokeRect(-10, -10, trackWidth + 20, 76);
+      ctx.font = '11px monospace';
+      ctx.fillStyle = '#c9d8ce';
+      ctx.fillText('AOM  /  CUT', 0, 4);
+      const progress = clamp((time - cutEnd) / sweep);
+      ctx.textAlign = 'right';
+      ctx.fillText(String(Math.floor(progress * total / 1000 * 24)).padStart(2, '0') + ' FR', trackWidth, 4);
+      ctx.fillStyle = '#52675a';
+      for (let tick = 0; tick <= 30; tick++) {
+        ctx.fillRect(tick * trackWidth / 30, 11, 1, tick % 5 === 0 ? 6 : 3);
+      }
+      for (const cut of cuts) {
+        const t = clamp((time - cut.start) / duration);
+        if (!t) continue;
+        const slots = Math.ceil((cuts.length - cut.track) / 2);
+        const width = trackWidth / slots;
+        const offset = (1 - t) ** 3;
+        const x = width * cut.slot + 14 * offset;
+        const y = 21 + cut.track * 21 - 9 * offset;
+        ctx.globalAlpha = fade * t;
+        ctx.fillStyle = cut.color;
+        ctx.fillRect(x, y, Math.max(1, width - 3 - width * .3 * offset), 15);
+        ctx.fillStyle = '#253632';
+        ctx.fillRect(x + 3, y + 3, 1, 9);
+      }
+      const head = progress * trackWidth;
+      ctx.globalAlpha = fade;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(head, 14, 1.5, 45);
+      ctx.beginPath();
+      ctx.moveTo(head - 4, 10); ctx.lineTo(head + 5, 10); ctx.lineTo(head + 1, 17);
+      ctx.fill();
+      ctx.restore();
+    }
+
     const started = performance.now();
     function draw(now) {
       const time = now - started;
@@ -107,7 +161,8 @@
         cursor(x, y, color);
       }
       ctx.globalAlpha = 1;
-      if (time < tasks[tasks.length - 1].start + duration + 125) frame = requestAnimationFrame(draw);
+      drawTimeline(time);
+      if (time < total) frame = requestAnimationFrame(draw);
       else stop();
     }
     frame = requestAnimationFrame(draw);
@@ -125,5 +180,4 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
   if (motion.addEventListener) motion.addEventListener('change', updatePreference);
   else motion.addListener(updatePreference);
-  play();
 })();
