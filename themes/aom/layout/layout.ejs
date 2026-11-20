@@ -3,7 +3,6 @@
 <meta name="theme-color" content="#0c0f10"><meta name="description" content="<%= page.description || p.intro %>"><title><%= title?title+' · '+p.name:p.name %></title>
 <link rel="icon" href="<%= url_for('assets/orbit.svg') %>">
 <% for(const css of ['styles','motion','mobile','pages']){ %><link rel="stylesheet" href="<%= url_for(css+'.css') %>"><% } %>
-<% if (is_home()) { %><script defer src="<%= url_for('swarm.js') %>?v=cursor2"></script><% } %>
 </head><body><header class="topbar"><div class="container topinner"><a class="brand" href="<%= url_for('/') %>"><img alt="" src="<%= url_for('assets/orbit.svg') %>"><span class="wordmark"><b><%= p.name %></b><small lang="en"><%= p.english %></small></span></a>
 <nav aria-label="主导航"><% for(const [label,path] of [['首页',''],['分类','categories/'],['归档','archives/'],['标签','tags/'],['关于','about/']]){ %><a href="<%= url_for(path||'/') %>" <% if((path && page.path.startsWith(path))||(!path && is_home())){ %>aria-current="page"<% } %>><%= label %></a><% } %></nav></div></header>
 <main id="app"><%- body %></main><footer><div class="container foot"><a class="small-brand" href="<%= url_for('/') %>"><img src="<%= url_for('assets/orbit.svg') %>" alt=""><%= p.name %></a><a href="<%= url_for('about/') %>">关于本站</a></div></footer></body></html>
